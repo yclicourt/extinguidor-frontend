@@ -1,0 +1,54 @@
+<svg
+  width="200"
+  height="240"
+  viewBox="0 0 200 240"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+
+    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f243a" />
+      <stop offset="100%" stop-color="#3f5d7c" />
+    </linearGradient>
+  </defs>
+
+
+  <path
+    d="
+      M100 10
+      C140 30, 180 40, 180 40
+      V150
+      C180 185, 140 215, 100 230
+      C60 215, 20 185, 20 150
+      V40
+      C20 40, 60 30, 100 10
+      Z
+    "
+    fill="url(#shieldGradient)"
+  />
+
+  <path
+    d="
+      M100 60
+      C130 95, 135 120, 100 160
+      C65 120, 70 95, 100 60
+      Z
+    "
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+
+  <path
+    d="
+      M100 95
+      C115 115, 112 135, 100 150
+      C88 135, 85 115, 100 95
+      Z
+    "
+    fill="#ffffff"
+  />
+</svg>
