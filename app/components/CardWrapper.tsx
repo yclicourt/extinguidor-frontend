@@ -1,32 +1,46 @@
-import { FaClipboardList, FaMoneyCheckDollar, FaRoute ,FaUsers} from "react-icons/fa6";
+import {
+  FaClipboardList,
+  FaMoneyCheckDollar,
+  FaRoute,
+  FaUsers,
+} from "react-icons/fa6";
 import { bebas } from "../ui/font";
+import { fetchCardData } from "../helpers/api";
 
-const cards = [
+
+
+const CardWrapper = async () => {
+  const {
+    numberOfFactureBinding,
+    numberOfParteTrabajoPending,
+    numberOfResultFinalizes,
+    numberOfUsersActivesWorkers,
+  } = await fetchCardData();
+
+  const cards = [
   {
-    icon:  FaMoneyCheckDollar,
+    icon: FaMoneyCheckDollar,
     title: "Total Binding",
-    value: `$${15000}`,
+    value: `$${numberOfFactureBinding}`,
   },
   {
     icon: FaRoute,
     title: "Completes Routes",
-    value: `${80}`,
+    value: `${numberOfResultFinalizes}`,
   },
   {
     icon: FaClipboardList,
     title: "Pending Work Orders",
-    value: `${42}`,
+    value: `${numberOfParteTrabajoPending}`,
   },
   {
     icon: FaUsers,
     title: "Active Workers",
-    value: `${15}`,
+    value: `${numberOfUsersActivesWorkers}`,
   },
 ];
-
-const CardWrapper = () => {
   return cards.map((card) => {
-    const LinIcon = card.icon
+    const LinIcon = card.icon;
     return (
       <div
         key={card.title}
@@ -49,7 +63,7 @@ const CardWrapper = () => {
       >
         {/* Icon */}
         <div className="flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-white/10 text-4xl text-white">
-          <LinIcon/>
+          <LinIcon />
         </div>
 
         {/* Title */}
@@ -60,7 +74,9 @@ const CardWrapper = () => {
         </h5>
 
         {/* Value */}
-        <p className="text-3xl font-bold text-center text-white">{card.value}</p>
+        <p className="text-3xl font-bold text-center text-white">
+          {card.value}
+        </p>
 
         {/* Subtle divider */}
         <div className="mt-4 h-px bg-white/10" />

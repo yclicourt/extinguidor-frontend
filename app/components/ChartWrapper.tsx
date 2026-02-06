@@ -12,7 +12,7 @@ import {
   ChartOptions,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { bebas } from "../ui/font";
+import {  roboto } from "../ui/font";
 
 // Registro de componentes de Chart.js
 ChartJS.register(
@@ -84,7 +84,7 @@ const ChartWrapper = () => {
         text: "Route Statistics (February 2026)",
         align: "start",
         color: "white",
-        font: { size: 16, weight: "bold", family: bebas.className },
+        font: { size: 20, weight: "bold", family: roboto.className },
       },
     },
     scales: {

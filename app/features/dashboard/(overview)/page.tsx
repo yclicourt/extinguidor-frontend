@@ -1,7 +1,7 @@
 import CardWrapper from "@/app/components/CardWrapper";
 import ChartWrapper from "@/app/components/ChartWrapper";
 import LatestPartsWrapper from "@/app/components/LatestPartsWrapper";
-import { RevenueChartSkeleton } from "@/app/components/Skeleton";
+import { RecentRoutesChartSkeleton } from "@/app/components/Skeleton";
 import { bebas } from "@/app/ui/font";
 import { Suspense } from "react";
 
@@ -19,7 +19,7 @@ const Dashboard = () => {
           <h2 className={`${bebas.className} mb-4 text-xl md:text-2xl`}>
             Recent Routes
           </h2>
-          <Suspense fallback={<RevenueChartSkeleton />}>
+          <Suspense fallback={<RecentRoutesChartSkeleton />}>
             <ChartWrapper />
           </Suspense>
         </div>
