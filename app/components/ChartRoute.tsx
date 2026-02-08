@@ -12,7 +12,7 @@ import {
   ChartOptions,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import {  roboto } from "../ui/font";
+import { roboto } from "../ui/font";
 
 // Registro de componentes de Chart.js
 ChartJS.register(
@@ -26,28 +26,22 @@ ChartJS.register(
   Filler,
 );
 
-const ChartWrapper = () => {
-  
-  const labels = [
-    "1",
-    "12",
-    "13",
-    "15",
-    "16",
-    "18",
-    "20",
-    "22",
-    "25",
-    "28",
-    "29",
-  ];
+interface ChartRoutesProps {
+  initialData: {
+    labels: string[];
+    consulted: number[];
+    completed: number[];
+  };
+}
+
+const ChartRoutes = ({ initialData }: ChartRoutesProps) => {
 
   const data = {
-    labels: labels,
+    labels: initialData.labels,
     datasets: [
       {
-        label: "Consulted Routes",
-        data: [18, 28, 32, 35, 38, 45, 52, 58, 65, 75, 85],
+        label: "Rutas Consultadas",
+        data: initialData.consulted,
         borderColor: "#3498db", // Azul del diseño
         backgroundColor: "rgba(52, 152, 219, 0.1)",
         tension: 0.4, // Curva suave
@@ -55,8 +49,8 @@ const ChartWrapper = () => {
         pointBackgroundColor: "#3498db",
       },
       {
-        label: "Completed Routes",
-        data: [10, 15, 20, 25, 28, 35, 40, 48, 55, 68, 78],
+        label: "Rutas Completadas",
+        data: initialData.completed,
         borderColor: "#2ecc71", // Verde del diseño
         backgroundColor: "rgba(46, 204, 113, 0.1)",
         tension: 0.4,
@@ -81,7 +75,7 @@ const ChartWrapper = () => {
       },
       title: {
         display: true,
-        text: "Route Statistics (February 2026)",
+        text: "Estadísticas de las Rutas ",
         align: "start",
         color: "white",
         font: { size: 20, weight: "bold", family: roboto.className },
@@ -91,10 +85,16 @@ const ChartWrapper = () => {
       y: {
         beginAtZero: true,
         grid: {
+          display: false,
           drawOnChartArea: false,
           color: "#f0f0f0",
         },
-        ticks: { stepSize: 10 },
+        ticks: {
+          autoSkip: true,
+          stepSize: 10,
+          maxRotation: 0,
+          font: { size: 10 },
+        },
       },
       x: {
         grid: { display: false },
@@ -109,4 +109,4 @@ const ChartWrapper = () => {
   );
 };
 
-export default ChartWrapper;
+export default ChartRoutes;
