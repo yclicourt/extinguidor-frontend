@@ -1,7 +1,10 @@
 import CardWrapper from "@/app/components/CardWrapper";
 import ChartRouteWrapper from "@/app/components/ChartRouteWrapper";
 import LatestPartsWorks from "@/app/components/LatestPartsWorks";
-import { RecentRoutesChartSkeleton } from "@/app/components/Skeleton";
+import {
+  LatestPartsSkeleton,
+  RecentRoutesChartSkeleton,
+} from "@/app/components/Skeleton";
 import { bebas } from "@/app/ui/font";
 import { Suspense } from "react";
 
@@ -37,7 +40,9 @@ const Dashboard = async ({ searchParams }: PageProps) => {
           <h2 className={`${bebas.className} mb-4 text-xl md:text-2xl`}>
             Latest Parts Works
           </h2>
-          <LatestPartsWorks searchParams={params} />
+          <Suspense fallback={<LatestPartsSkeleton />}>
+            <LatestPartsWorks searchParams={params} />
+          </Suspense>
         </div>
       </div>
     </main>

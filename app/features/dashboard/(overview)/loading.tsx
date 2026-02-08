@@ -1,7 +1,6 @@
+import DashboardSkeleton from "@/app/components/Skeleton";
 
 const Loading = () => {
-  return (
-    <div>Loading</div>
-  )
-}
-export default Loading
+  return <DashboardSkeleton />;
+};
+export default Loading;
