@@ -4,6 +4,10 @@ interface Facture {
   facture_amount: number;
 }
 
+/**
+ * All fetching data to Dashboard View
+ */
+
 // Method to Fetching Card Data
 export const fetchCardData = async () => {
   try {
@@ -106,5 +110,32 @@ export const fetchTablePartsWorks = async ({
   } catch (error) {
     console.log("error: ", error);
     throw new Error("Failed to fetch fetchRoute data");
+  }
+};
+
+/**
+ * All fetching data to ParteTrabajo View
+ */
+
+export const fetchRoutesGest = async ({
+  limit = 5,
+}: { limit?: number } = {}) => {
+  try {
+    const fetchRoutes = await fetch(
+      `${process.env.BACKEND_URL}/rutas?limit=${limit}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+    const resultFetchRoutes = await fetchRoutes.json();
+
+    return {
+      data: resultFetchRoutes,
+      params: { limit },
+    };
+  } catch (error) {
+    console.log("error", error);
+    throw new Error("Failed to fetching RouteGest data");
   }
 };

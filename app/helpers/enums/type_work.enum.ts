@@ -1,0 +1,6 @@
+export enum TipoTrabajo {
+  OBRA ="OBRA",
+  MANTENIMIENTO="MANTENIMIENTO",
+  CORRECTIVO ="CORRECTIVO",
+  VISITAS = "VISITAS"
+}
