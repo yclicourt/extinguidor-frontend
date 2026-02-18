@@ -139,3 +139,36 @@ export const fetchRoutesGest = async ({
     throw new Error("Failed to fetching RouteGest data");
   }
 };
+
+/**
+ * All fetching data to users view
+ */
+
+interface PropsUser {
+  searchParams: Promise<{ page?: string; query?: string }>;
+}
+export const fetchUsers = async ({
+  searchParams,
+  limit = 5,
+}: PropsUser & { limit?: number }) => {
+  const params = (await searchParams) || {};
+  const searchTerm = params.query || "";
+  try {
+    const currentPage = params.page ? parseInt(params.page) : 1;
+    const fetchUser = await fetch(
+      `${process.env.BACKEND_URL}/users?query=${searchTerm}&page=${currentPage}&limit=${limit}`,
+      {
+        cache: "no-store",
+      },
+    );
+    const resultUser = await fetchUser.json();
+    return {
+      data: resultUser.data,
+      totalPages: resultUser.totalPages,
+      params: { limit, currentPage },
+    };
+  } catch (error) {
+    console.log("error", error);
+    throw new Error("Failed to fetching RouteGest data");
+  }
+};

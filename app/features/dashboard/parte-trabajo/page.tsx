@@ -12,7 +12,7 @@ const ParteTrabajo = () => {
       <ParteTrabajoWrapper>
         <div className="flex gap-6 flex-1 overflow-hidden">
           {/* Sección Izquierda */}
-          <div className="flex-3 bg-slate-700 rounded-xl shadow-sm border border-gray-200 flex flex-col">
+          <div className="flex-3 bg-slate-200 rounded-xl shadow-sm border border-gray-200 flex flex-col">
             <div className="p-4 border-b border-gray-100 flex justify-between items-center">
               <div className="relative w-64">
                 <Search
@@ -24,7 +24,7 @@ const ParteTrabajo = () => {
                   placeholder="Search"
                 />
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-200">
+              <div className="flex items-center gap-2 text-sm text-slate-600">
                 <FilterIcon size={16} /> Filtros
               </div>
             </div>

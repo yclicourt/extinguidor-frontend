@@ -5,11 +5,17 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        port: "",
-        hostname: "**",
+        protocol: "http",
+        port: "4000",
+        hostname: "localhost",
+        pathname: '/api/v1/uploads/**',
       },
     ],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",// aumentamos el limite del body
+    },
   },
 };
 

@@ -9,10 +9,10 @@ async function RouteGest() {
   const dateRoute = new Date();
   return (
     <aside className="flex-1 flex flex-col gap-4 overflow-y-auto">
-      <div className="bg-slate-700 p-4 rounded-xl shadow-sm border border-gray-200">
-        <h3 className="font-bold text-gray-200 text-sm mb-4 flex justify-between">
+      <div className="bg-slate-500 p-4 rounded-xl shadow-sm border border-gray-200">
+        <h3 className="font-bold text-slate-700 text-sm mb-4 flex justify-between">
           Rutas del día {`${dateRoute.getDate()}`}
-          <span className="text-gray-400 font-normal">{`${data.length} Pedidos`}</span>
+          <span className="text-slate-300 font-normal">{`${data.length} Pedidos`}</span>
         </h3>
 
         <div className="space-y-3">
@@ -31,10 +31,10 @@ async function RouteGest() {
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-gray-200 truncate">
+                <p className="text-xs font-bold text-slate-300 truncate">
                   {ruta.title}
                 </p>
-                <p className="text-[10px] text-gray-500">
+                <p className="text-[10px] text-slate-800">
                   {ruta.vehicle.matricule}
                 </p>
               </div>

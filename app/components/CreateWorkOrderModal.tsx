@@ -44,6 +44,7 @@ const ModalCreateRoute = ({ isOpen, onClose, onSave }: Props) => {
     onClose();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const inputStyles = (hasError: any) => `
     w-full bg-slate-700 border ${hasError ? "border-red-500" : "border-slate-600"} 
     rounded-lg p-2 text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm
@@ -139,7 +140,7 @@ const ModalCreateRoute = ({ isOpen, onClose, onSave }: Props) => {
                 {...register("state", { required: true })}
                 className={inputStyles(errors.state)}
               >
-                <option value="">Seleccionar...</option>
+                <option value="" disabled>Seleccionar...</option>
                 <option value="PENDIENTE text-black">Pendiente</option>
                 <option value="EN_PROGRESO">En Progreso</option>
                 <option value="FINALIZADO">Finalizado</option>
@@ -152,7 +153,7 @@ const ModalCreateRoute = ({ isOpen, onClose, onSave }: Props) => {
                 {...register("type_work", { required: true })}
                 className={inputStyles(errors.type_work)}
               >
-                <option value="">Seleccionar...</option>
+                <option value="" disabled>Seleccionar...</option>
                 <option value="OBRA">Obra</option>
                 <option value="MANTENIMIENTO">Mantenimiento</option>
                 <option value="CORRECTIVO">Correctivo</option>
@@ -165,7 +166,7 @@ const ModalCreateRoute = ({ isOpen, onClose, onSave }: Props) => {
                 {...register("category", { required: true })}
                 className={inputStyles(errors.category)}
               >
-                <option value="">Seleccionar...</option>
+                <option value="" disabled>Seleccionar...</option>
                 <option value="EXTINTORES">Extintores</option>
                 <option value="INCENDIO">Incendio</option>
                 <option value="ROBO">Robo</option>
