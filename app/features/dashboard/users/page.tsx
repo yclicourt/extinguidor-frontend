@@ -1,7 +1,7 @@
-import Pagination from "@/app/components/Pagination";
-import SearchUser from "@/app/components/Search";
-import UserTable from "@/app/components/UserTable";
-import UserWrapper from "@/app/components/UserWrapper";
+import Pagination from "@/app/components/dashboard/Pagination";
+import SearchUser from "@/app/components/users/Search";
+import UserTable from "@/app/components/users/UserTable";
+import UserWrapper from "@/app/components/users/UserWrapper";
 import { fetchUsers } from "@/app/helpers/api";
 import { Suspense } from "react";
 

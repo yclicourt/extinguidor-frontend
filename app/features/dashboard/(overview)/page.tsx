@@ -1,10 +1,10 @@
-import CardWrapper from "@/app/components/CardWrapper";
-import ChartRouteWrapper from "@/app/components/ChartRouteWrapper";
-import LatestPartsWorks from "@/app/components/LatestPartsWorks";
+import CardWrapper from "@/app/components/dashboard/CardWrapper";
+import ChartRouteWrapper from "@/app/components/dashboard/ChartRouteWrapper";
+import LatestPartsWorks from "@/app/components/dashboard/LatestPartsWorks";
 import {
   LatestPartsSkeleton,
   RecentRoutesChartSkeleton,
-} from "@/app/components/Skeleton";
+} from "@/app/components/common/Skeleton";
 import { bebas } from "@/app/ui/font";
 import { Suspense } from "react";
 

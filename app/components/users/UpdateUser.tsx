@@ -1,5 +1,5 @@
 import { Edit2 } from "lucide-react";
-import { User } from "../helpers/interfaces/user.interface";
+import { User } from "../../helpers/interfaces/user.interface";
 
 interface PropsUpdateUser {
   user: User;

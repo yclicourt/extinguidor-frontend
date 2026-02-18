@@ -1,4 +1,4 @@
-import { fetchTablePartsWorks } from "../helpers/api";
+import { fetchTablePartsWorks } from "../../helpers/api";
 import HeaderLatestPartsWorks from "./HeaderLatestPartsWorks";
 import LastPartsWorksTableWrapper from "./LastPartsWorksTableWrapper";
 import Pagination from "./Pagination";

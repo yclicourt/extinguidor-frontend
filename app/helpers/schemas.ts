@@ -5,6 +5,17 @@ import { Role } from "./enums/role.enum";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB en bytes
 const ACCEPTED_FORMATS = ["image/webp", "image/jpeg", "image/png"];
 
+const fileSchema = z
+  .instanceof(File)
+  .refine(
+    (file) => file.size <= MAX_FILE_SIZE,
+    "El archivo no puede pesar más de 5MB",
+  )
+  .refine(
+    (file) => ACCEPTED_FORMATS.includes(file.type),
+    "Solo se aceptan los formatos .webp, .jpg y .png",
+  );
+
 const UserFormSchema = z.object({
   id: z.coerce.number(),
   name: z
@@ -58,20 +69,11 @@ const UserFormSchema = z.object({
     },
     z.array(z.enum(Role)),
   ),
-  avatar: z
-    .instanceof(File, {
-      message: "El archivo es obligatorio",
-    })
-    // Validacion del tamaño
-    .refine(
-      (file) => file.size <= MAX_FILE_SIZE,
-      "El archivo no puede pesar más de 5MB",
-    )
-    // Validacion de Formato(MIME Type)
-    .refine(
-      (file) => ACCEPTED_FORMATS.includes(file.type),
-      "Solo se aceptan los formatos .webp, .jpg y .png",
-    ),
+  avatar: z.preprocess((val) => {
+    // Si no hay archivo o el tamaño es 0, devolvemos undefined
+    if (val instanceof File && val.size === 0) return undefined;
+    return val;
+  }, fileSchema.optional()),
 });
 
 const statusValues = Object.values(Status) as [string, ...string[]];

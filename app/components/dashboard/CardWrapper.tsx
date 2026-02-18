@@ -4,8 +4,8 @@ import {
   FaRoute,
   FaUsers,
 } from "react-icons/fa6";
-import { bebas } from "../ui/font";
-import { fetchCardData } from "../helpers/api";
+import { bebas } from "../../ui/font";
+import { fetchCardData } from "../../helpers/api";
 
 
 

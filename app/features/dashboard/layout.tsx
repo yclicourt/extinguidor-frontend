@@ -1,5 +1,5 @@
-import Header from "@/app/components/Header";
-import SideNav from "@/app/components/SideNav";
+import Header from "@/app/components/common/Header";
+import SideNav from "@/app/components/common/SideNav";
 import { FC, PropsWithChildren } from "react";
 
 const DashboardLayout: FC<PropsWithChildren> = ({ children }) => {

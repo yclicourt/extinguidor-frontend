@@ -1,6 +1,6 @@
 "use client";
 import { Trash2 } from "lucide-react";
-import { deleteUserForm } from "../helpers/actions";
+import { deleteUserForm } from "../../helpers/actions";
 import { toast } from "sonner";
 
 const DeleteUser = ({ id }: { id: number }) => {

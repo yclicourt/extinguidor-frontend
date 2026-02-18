@@ -1,127 +1,135 @@
-import { z } from "zod";
-import { UpdateUserForm } from "../helpers/schemas";
-import { editUserForm } from "../helpers/actions";
-import { useActionState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+"use client";
+
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useActionState, useEffect } from "react";
+import { createUserForm } from "../../helpers/actions";
+import { z } from "zod";
+import { CreateUserForm } from "../../helpers/schemas";
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface PropsModal {
   isOpen: boolean;
   onClose: () => void;
-  user: UpdateUserInputs | null;
 }
 // Creamos un tipo para tipar la key en el useEffect
-type UpdateUserInputs = z.infer<typeof UpdateUserForm>;
+type CreateUserInputs = z.infer<typeof CreateUserForm>;
 
-const UpdateUserFormModal = ({ isOpen, onClose, user }: PropsModal) => {
+const CreateUserFormModal = ({ isOpen, onClose }: PropsModal) => {
   // Vinculo de la server Actions con useActionState
-  const [state, formAction, isPending] = useActionState(editUserForm, {
+  const [state, formAction, isPending] = useActionState(createUserForm, {
     errors: {},
     message: null,
-    success: false,
   });
   const {
     register,
     formState: { errors },
     reset,
     setError,
+    control,
   } = useForm({
-    resolver: zodResolver(UpdateUserForm),
+    resolver: zodResolver(CreateUserForm),
   });
 
-  useEffect(() => {
+  // Vigilamos el campo avatar
+  const avatarFile = useWatch({ control, name: "avatar" });
 
-    // Si no hay mensaje, no hacemos nada
-    if (!state.message) return;
-    
-    if (state.errors) {
-      Object.entries(state.errors).forEach(([key, errorMessages]) => {
-        if (errorMessages && errorMessages.length > 0) {
-          // Casteamos la key con el type que creamos
-          setError(key as keyof UpdateUserInputs, {
-            type: "server",
-            message: errorMessages[0],
-          });
-        }
-      });
+  // Lógica para decidir qué imagen mostrar
+  const getImagePreview = () => {
+    if (avatarFile instanceof FileList && avatarFile.length > 0) {
+      // Si hay un archivo seleccionado, creamos una URL temporal
+      return URL.createObjectURL(avatarFile[0]);
     }
-
-    if (state.success === false && state.message) {
-      toast.error(state.message); // Notificación roja de error
-    }
-    if (isOpen && user) {
-      reset({
-        id: user.id,
-        name: user.name,
-        lastname: user.lastname,
-        email: user.email,
-        address: user.address,
-        status: user.status,
-        role: user.role,
-        phone: user.phone,
-      });
-    }
-    if (state.success) {
-      toast.success("Usuario actualizado correctamente");
-      onClose();
-      reset();
-    }
-  }, [state, setError, onClose, reset, isOpen, user]);
-  if (!isOpen) return null;
-
-  const handleFormAction = async (formData: FormData) => {
-    // Podrías añadir validaciones extra aquí si quisieras
-    formAction(formData);
+    // Si no hay nada, usamos la de la carpeta public
+    return "/avatar.svg";
   };
 
+  // Convertimos a string por seguridad (maneja arrays o strings)
+  const messageText = Array.isArray(state.message)
+    ? state.message[0]
+    : String(state.message);
+
+  const messageLower = messageText.toLowerCase();
+
+  useEffect(() => {
+    // Si no hay mensaje, no hacemos nada
+    if (!state.message) return;
+
+    // CASO: ERROR
+    if (
+      state.success === false ||
+      (state.errors && Object.keys(state.errors).length > 0)
+    ) {
+      if (messageLower.includes("teléfono")) {
+        setError("phone", { type: "server", message: state.message });
+      }
+
+      if (messageLower.includes("email")) {
+        setError("email", { type: "server", message: state.message });
+      }
+      // Actualizamos el toast usando el ID para que deje de cargar
+      toast.error(state.message || "Error en el servidor", {
+        id: "create-user",
+        duration: 5000, // Asegúrate de que dure lo suficiente para leerlo
+      }); // Salimos para evitar procesar otros bloques
+
+      if (state.errors) {
+        Object.entries(state.errors).forEach(([key, errorMessages]) => {
+          setError(key as keyof CreateUserInputs, {
+            type: "server",
+            message: errorMessages?.[0],
+          });
+        });
+      }
+      // IMPORTANTE: Limpiamos el mensaje del estado localmente si fuera posible,
+      // pero como 'state' es de solo lectura, usaremos el onClose para resetear todo el componente.
+    }
+
+    // CASO: ÉXITO
+    if (state.success) {
+      toast.success(state.message, { id: "create-user" });
+
+      // Usamos un pequeño delay para limpiar y cerrar
+      const timer = setTimeout(() => {
+        onClose(); // Esto debería desmontar el modal y con él su estado
+        reset(); // Reset de React Hook Form
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [state, setError, onClose, reset, messageLower]);
+
+  if (!isOpen) return null;
+
   const inputStyles = (hasError: unknown) => `
-    w-full appearance-none bg-slate-700 border ${hasError ? "border-red-500" : "border-slate-600"}
+    w-full bg-slate-700 border ${hasError ? "border-red-500" : "border-slate-600"} 
     rounded-lg p-2 text-white outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm
   `;
 
   const labelStyles =
-    "block text-left appearance-none text-[10px] text-gray-400 mb-1 uppercase font-bold tracking-wider";
+    "block text-[10px] text-gray-400 mb-1 uppercase font-bold tracking-wider";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-slate-800 border border-slate-600 w-full max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header - Fijo */}
         <div className="p-5 border-b border-slate-700">
-          <h2 className="text-xl text-left font-bold text-white">
-            Actualizar un usuario
-          </h2>
-          <p className="text-gray-400 text-left text-xs mt-1">
+          <h2 className="text-xl font-bold text-white">Crear Nuevo Usuario</h2>
+          <p className="text-gray-400 text-xs mt-1">
             Complete todos los campos para registrar el usuario.
           </p>
         </div>
 
         {/* Formulario - Con Scroll */}
         <form
-          id="update-user-form"
-          action={handleFormAction}
+          id="create-user-form"
+          action={formAction}
           className="flex-1 overflow-y-auto p-6 custom-scrollbar"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             {/* Sección: Información Principal (Full Width) */}
             <div className="md:col-span-2 space-y-4">
-              <div>
-                <label className={labelStyles} hidden>
-                  ID
-                </label>
-                <input
-                  {...register("id")}
-                  type="hidden"
-                  name="id"
-                  className={inputStyles(errors.id)}
-                  placeholder="Ej: 1"
-                />
-                {errors.id && (
-                  <p className="text-red-500 text-[10px] mt-1 italic">
-                    {errors.id.message as string}
-                  </p>
-                )}
-              </div>
               <div>
                 <label className={labelStyles}>Nombre</label>
                 <input
@@ -152,7 +160,6 @@ const UpdateUserFormModal = ({ isOpen, onClose, user }: PropsModal) => {
                 )}
               </div>
             </div>
-
             {/* Sección: Datos del Cliente y Ubicación */}
             <div className="md:col-span-2">
               <label className={labelStyles}>Email</label>
@@ -168,7 +175,6 @@ const UpdateUserFormModal = ({ isOpen, onClose, user }: PropsModal) => {
                 </p>
               )}
             </div>
-
             <div className="md:col-span-2">
               <label className={labelStyles}>Dirección</label>
               <input
@@ -183,7 +189,6 @@ const UpdateUserFormModal = ({ isOpen, onClose, user }: PropsModal) => {
                 </p>
               )}
             </div>
-
             {/* Sección: Selectores */}
             <div>
               <label className={labelStyles}>Estado</label>
@@ -194,8 +199,8 @@ const UpdateUserFormModal = ({ isOpen, onClose, user }: PropsModal) => {
                 <option value="" disabled>
                   Seleccionar...
                 </option>
-                <option value="ACTIVE">ACTIVE</option>
-                <option value="INACTIVE">INACTIVE</option>
+                <option value="ACTIVO">ACTIVO</option>
+                <option value="INACTIVO">INACTIVO</option>
                 <option value="OFFLINE">OFFLINE</option>
               </select>
               {errors.status && (
@@ -204,7 +209,6 @@ const UpdateUserFormModal = ({ isOpen, onClose, user }: PropsModal) => {
                 </p>
               )}
             </div>
-
             <div>
               <label className={labelStyles}>Role</label>
               <select
@@ -223,7 +227,6 @@ const UpdateUserFormModal = ({ isOpen, onClose, user }: PropsModal) => {
                 </p>
               )}
             </div>
-
             {/* Sección: IDs y Facturación */}
             <div>
               <label className={labelStyles}>Teléfono</label>
@@ -239,7 +242,6 @@ const UpdateUserFormModal = ({ isOpen, onClose, user }: PropsModal) => {
                 </p>
               )}
             </div>
-
             <div>
               <label className={labelStyles}>Contraseña</label>
               <input
@@ -254,15 +256,35 @@ const UpdateUserFormModal = ({ isOpen, onClose, user }: PropsModal) => {
                 </p>
               )}
             </div>
-
             {/* File Upload */}
-            <div className="md:col-span-2">
-              <label className={labelStyles}>Ávatar</label>
-              <input
-                name="avatar"
-                type="file"
-                className="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
-              />
+            <div className="md:col-span-2 flex items-center gap-4 bg-slate-700/30 p-4 rounded-lg border border-slate-600">
+              <div className="relative shrink-0">
+                <Image
+                  src={getImagePreview()}
+                  height={80}
+                  width={80}
+                  className="rounded-full object-cover border-2 border-blue-500 shadow-lg"
+                  alt="Preview avatar"
+                />
+              </div>
+
+              <div className="flex-1">
+                <label className={labelStyles}>Foto de Perfil</label>
+                <input
+                  {...register("avatar")}
+                  type="file"
+                  accept="image/*"
+                  className="block w-full text-xs text-slate-400 
+                    file:mr-4 file:py-2 file:px-4 
+                    file:rounded-full file:border-0 
+                    file:text-xs file:font-semibold 
+                    file:bg-blue-600 file:text-white 
+                    hover:file:bg-blue-700 cursor-pointer"
+                />
+                <p className="text-[9px] text-gray-500 mt-1">
+                  Si no seleccionas una, se asignará una por defecto.
+                </p>
+              </div>
             </div>
           </div>
         </form>
@@ -278,15 +300,22 @@ const UpdateUserFormModal = ({ isOpen, onClose, user }: PropsModal) => {
           </button>
           <button
             type="submit"
-            form="update-user-form"
+            form="create-user-form"
             disabled={isPending}
+            onClick={() => {
+              // Solo disparamos el loading si el formulario es válido visualmente
+              if (Object.keys(errors).length === 0) {
+                toast.loading("Registrando usuario...", { id: "create-user" });
+              }
+            }}
             className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white px-8 py-2 rounded-lg text-sm font-bold transition-all"
           >
-            {isPending ? "Actualizando..." : "Editar Usuario"}
+            {isPending ? "Guardando..." : "Guardar Usuario"}
+            {}
           </button>
         </div>
       </div>
     </div>
   );
 };
-export default UpdateUserFormModal;
+export default CreateUserFormModal;

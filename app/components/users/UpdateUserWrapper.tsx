@@ -3,7 +3,7 @@
 import { useState } from "react";
 import UpdateUser from "./UpdateUser";
 import UpdateUserFormModal from "./UpdateUserFormModal";
-import { User } from "../helpers/interfaces/user.interface";
+import { User } from "../../helpers/interfaces/user.interface";
 
 const UpdateUserWrapper = ({ user }: { user: User }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);

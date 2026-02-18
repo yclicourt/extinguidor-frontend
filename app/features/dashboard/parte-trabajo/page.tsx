@@ -1,8 +1,8 @@
 import { Search, Calendar as FilterIcon } from "lucide-react";
 
-import Calendar from "@/app/components/Calendar";
-import RouteGest from "@/app/components/RouteGest";
-import ParteTrabajoWrapper from "@/app/components/ParteTrabajoWrapper";
+import Calendar from "@/app/components/calendar/Calendar";
+import RouteGest from "@/app/components/rutas/RouteGest";
+import ParteTrabajoWrapper from "@/app/components/parte-trabajo/ParteTrabajoWrapper";
 
 const ParteTrabajo = () => {
   return (

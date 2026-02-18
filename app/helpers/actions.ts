@@ -16,9 +16,11 @@ export const createUserForm = async (
   // Validamos la data de entrada
   const rawData = Object.fromEntries(formData.entries());
 
+  const avatarFile = formData.get("avatar") as File;
+
   const validateFields = CreateUserForm.safeParse({
     ...rawData,
-    avatar: formData.get("avatar"),
+    avatar: avatarFile,
   });
 
   if (!validateFields.success) {
@@ -28,10 +30,33 @@ export const createUserForm = async (
     };
   }
 
+  const dataToSend = new FormData();
+  const data = validateFields.data;
+
+  // Adjuntamos campos de texto
+  Object.entries(data).forEach(([key, value]) => {
+    if (key !== "avatar" && value !== undefined) {
+      if (key === "role" && Array.isArray(value)) {
+        value.forEach((v) => dataToSend.append("role", v));
+      } else {
+        dataToSend.append(key, String(value));
+      }
+    }
+  });
+
+  // Lógica de la imagen
+  if (data.avatar && data.avatar.size > 0) {
+    dataToSend.append("avatar", data.avatar);
+  } else {
+    // Si el usuario no subió nada, enviamos el nombre de tu archivo default
+    // El backend debe estar listo para recibir este string
+    dataToSend.append("avatar", "avatar.svg");
+  }
+
   try {
     const response = await fetch(`${process.env.BACKEND_URL}/auth/register`, {
       method: "POST",
-      body: formData,
+      body: dataToSend,
     });
     const errorData = await response.json();
 
@@ -47,8 +72,9 @@ export const createUserForm = async (
 
     return { success: true, message: "Usuario creado con éxito", errors: {} };
   } catch (error) {
-    console.log(error);
-    return { success: false, message: "Error en la base de datos", errors: {} };
+    const errorMessage =
+      error instanceof Error ? error.message : "Error en la base de datos";
+    return { success: false, message: errorMessage, errors: {} };
   }
 };
 
@@ -57,6 +83,7 @@ export const editUserForm = async (
   formData: FormData,
 ): Promise<FormState> => {
 
+  console.log('!!!ACTION ACTIVADA!!!!')
   const rawData = Object.fromEntries(formData.entries());
 
   // Si el archivo tiene tamaño 0, lo ponemos como undefined para que Zod .optional() funcione
@@ -104,6 +131,7 @@ export const editUserForm = async (
     }
   });
 
+  console.log('Data ready para enviar al backend : ',dataToSend)
   try {
     const url = `${process.env.BACKEND_URL}/users/${validatedData.id}`;
     const response = await fetch(url, {

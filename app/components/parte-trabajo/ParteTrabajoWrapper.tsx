@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import HeaderCalendar from "./HeaderCalendar";  
-import ModalCreateRoute from "./CreateWorkOrderModal";
+import HeaderCalendar from "./calendar/HeaderCalendar";  
+import ModalCreateRoute from "./parte-trabajo/CreateWorkOrderModal";
 import { ParteTrabajo } from "../helpers/interfaces/parte-trabajo.interface";
 
 interface PropsParteTrabajo {

@@ -12,7 +12,7 @@ import {
   ChartOptions,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { roboto } from "../ui/font";
+import { roboto } from "../../ui/font";
 
 // Registro de componentes de Chart.js
 ChartJS.register(

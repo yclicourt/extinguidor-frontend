@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { fetchRoutesGest } from "../helpers/api";
-import { Ruta } from "../helpers/interfaces/ruta.interface";
+import { fetchRoutesGest } from "../../helpers/api";
+import { Ruta } from "../../helpers/interfaces/ruta.interface";
 
 
 

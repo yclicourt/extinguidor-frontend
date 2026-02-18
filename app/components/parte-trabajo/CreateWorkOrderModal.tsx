@@ -1,9 +1,9 @@
 // components/ModalCreateRoute.tsx
 "use client";
 import { useForm } from "react-hook-form";
-import { EstadoParteTrabajo } from "../helpers/enums/part_work.enum";
-import { TipoTrabajo } from "../helpers/enums/type_work.enum";
-import { Categoria } from "../helpers/enums/category.enum";
+import { EstadoParteTrabajo } from "../../helpers/enums/part_work.enum";
+import { TipoTrabajo } from "../../helpers/enums/type_work.enum";
+import { Categoria } from "../../helpers/enums/category.enum";
 
 interface ParteTrabajoFormData {
   title: string;

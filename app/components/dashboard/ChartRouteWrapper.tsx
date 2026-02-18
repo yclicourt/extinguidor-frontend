@@ -1,4 +1,4 @@
-import { fetchChartRoutes } from "../helpers/api";
+import { fetchChartRoutes } from "../../helpers/api";
 import ChartRoutes from "./ChartRoute";
 
 interface Stats {

@@ -1,9 +1,26 @@
 import { Mail, ShieldCheck } from "lucide-react";
-import { User } from "../helpers/interfaces/user.interface";
+import { User } from "../../helpers/interfaces/user.interface";
 import UpdateUserWrapper from "./UpdateUserWrapper";
 import DeleteUser from "./DeleteUser";
+import UserAvatar from "./UserAvatar";
 
 const UserTable = async ({ data }: { data: User[] }) => {
+  const getAvatarUrl = (avatarPath: string | null) => {
+    if (!avatarPath) return null;
+
+    // Si el avatar es el string por defecto, lo buscamos en el public del FRONTEND
+    if (avatarPath === "avatar.svg") {
+      return "/avatar.svg";
+    }
+
+    // Si es una URL completa (ej. Cloudinary), la usamos tal cual
+    if (avatarPath.startsWith("http")) {
+      return avatarPath;
+    }
+
+    // Si es una ruta local del backend (/uploads/...)
+    return `${process.env.BACKEND_URL}${avatarPath}`;
+  };
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left">
@@ -26,13 +43,12 @@ const UserTable = async ({ data }: { data: User[] }) => {
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-700 flex items-center justify-center border border-slate-600">
                     {user.avatar ? (
-                      <img
-                        src={`${process.env.BACKEND_URL}${user.avatar}`}
-                        alt={user.name} // Hace que la imagen ocupe el contenedor relativo
-                        className="w-full h-full object-cover"
+                      <UserAvatar
+                        src={getAvatarUrl(user.avatar) || "/avatar.svg"}
+                        alt={user.name}
                       />
                     ) : (
-                      <span className="text-xs font-bold text-white">
+                      <span className="text-xs font-bold text-white uppercase">
                         {user.name.charAt(0)}
                       </span>
                     )}
@@ -56,7 +72,7 @@ const UserTable = async ({ data }: { data: User[] }) => {
               <td className="px-6 py-4 text-center text-xs font-bold">
                 <span
                   className={`px-3 py-1 rounded-full ${
-                    user.status === "ACTIVE"
+                    user.status === "ACTIVO"
                       ? "bg-green-300 text-green-600"
                       : "bg-slate-400 text-slate-800"
                   }`}

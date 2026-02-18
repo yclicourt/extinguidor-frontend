@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import CreateUserFormModal from "./CreateUserFormModal";
-import HeaderUser from "./HeaderUser";
+import HeaderUser from "../dashboard/HeaderUser";
 
 interface PropsUser {
   children: React.ReactNode;

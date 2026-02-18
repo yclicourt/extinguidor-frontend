@@ -1,5 +1,5 @@
-import { EstadoParteTrabajo } from "../helpers/enums/part_work.enum";
-import { StatusBadge } from "./StatusBadge";
+import { EstadoParteTrabajo } from "../../helpers/enums/part_work.enum";
+import { StatusBadge } from "../common/StatusBadge";
 
 interface Props {
   initialParts: PartWork[];
