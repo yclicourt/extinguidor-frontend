@@ -1,8 +1,7 @@
 "use client";
 import { useState } from "react";
-import HeaderCalendar from "./calendar/HeaderCalendar";  
-import ModalCreateRoute from "./parte-trabajo/CreateWorkOrderModal";
-import { ParteTrabajo } from "../helpers/interfaces/parte-trabajo.interface";
+import ModalCreateRoute from "../parte-trabajo/CreateWorkOrderModal";
+import { ParteTrabajo } from "../../helpers/interfaces/parte-trabajo.interface";
 
 interface PropsParteTrabajo {
   children: React.ReactNode;
@@ -31,7 +30,6 @@ const ParteTrabajoWrapper = ({ children }: PropsParteTrabajo) => {
   };
   return (
     <>
-      <HeaderCalendar openModal={() => setIsModalOpen(true)} />
       {children}
       <ModalCreateRoute
         isOpen={isModalOpen}

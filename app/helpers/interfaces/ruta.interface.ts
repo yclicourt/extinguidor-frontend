@@ -1,4 +1,5 @@
 import { EstadoParteTrabajo } from "../enums/part_work.enum";
+import { ParteTrabajo } from "./parte-trabajo.interface";
 
 export interface Ruta {
   id: number;
@@ -6,7 +7,7 @@ export interface Ruta {
   in_charge: string;
   userId: number;
   vehicle: {
-    matricule: string
+    matricule: string;
   };
   factureId: number;
   tools: string[];
@@ -14,4 +15,5 @@ export interface Ruta {
   comments?: string;
   status: EstadoParteTrabajo;
   amount_facture_route: number;
+  partes?: ParteTrabajo[];
 }

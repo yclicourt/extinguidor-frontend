@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { CreateUserForm, UpdateUserForm } from "./schemas";
+import { CreateRouteForm, CreateUserForm, UpdateUserForm } from "./schemas";
 
 export type FormState = {
   errors?: Record<string, string[]>;
@@ -9,6 +9,9 @@ export type FormState = {
   success?: boolean;
 };
 
+/**
+ * Actions para UserView
+ */
 export const createUserForm = async (
   prevState: FormState,
   formData: FormData,
@@ -82,8 +85,6 @@ export const editUserForm = async (
   prevState: FormState,
   formData: FormData,
 ): Promise<FormState> => {
-
-  console.log('!!!ACTION ACTIVADA!!!!')
   const rawData = Object.fromEntries(formData.entries());
 
   // Si el archivo tiene tamaño 0, lo ponemos como undefined para que Zod .optional() funcione
@@ -131,7 +132,6 @@ export const editUserForm = async (
     }
   });
 
-  console.log('Data ready para enviar al backend : ',dataToSend)
   try {
     const url = `${process.env.BACKEND_URL}/users/${validatedData.id}`;
     const response = await fetch(url, {
@@ -176,5 +176,102 @@ export const deleteUserForm = async (userId: number) => {
   } catch (error) {
     console.log(error);
     return { success: false, message: "Error en la base de datos" };
+  }
+};
+
+/**
+ * Actions para ParteTrabajo View
+ */
+
+export const editParteTrabajoAssignToRoute = async (
+  parteId: number,
+  routeId: number,
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.BACKEND_URL}/partes-trabajo/${parteId}/assign/${routeId}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          // Aquí puedes añadir tokens de sesión si tu backend lo requiere
+        },
+      },
+    );
+
+    if (!response.ok) {
+      return { success: false, error: "Error en el servidor backend" };
+    }
+
+    // Esto limpia la caché de la página del calendario para que los datos se refresquen
+    revalidatePath("/features/dashboard/parte-trabajo");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Action Error:", error);
+    return { success: false, error: "Fallo de conexión" };
+  }
+};
+
+/**
+ * Actions para Rutas
+ */
+
+export type FormStateRoute = {
+  errors?: Record<string, string[]>;
+  message?: string | null;
+  success?: boolean;
+};
+export const createRouteForm = async (
+  prevState: FormState,
+  formData: FormData,
+): Promise<FormStateRoute> => {
+  const validateFields = CreateRouteForm.safeParse({
+    title: formData.get("title")?.toString(),
+    in_charge: formData.get("in_charge")?.toString(),
+    userId: Number(formData.get("userId")),
+    vehicleId: Number(formData.get("vehicleId")),
+    factureId: Number(formData.get("factureId")),
+    tools: formData.getAll("tools"),
+    state: formData.get("state")?.toString(),
+    amount_facture_route: Number(formData.get("amount_facture_route")),
+    date: new Date(formData.get("date")?.toString() || ""),
+    comments: formData.get("comments")?.toString(),
+  });
+
+  if (!validateFields.success) {
+    return {
+      errors: validateFields.error.flatten().fieldErrors,
+      message: "No se encuentran los campos, Fallo al crear el usuario",
+    };
+  }
+
+  try {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+
+    const response = await fetch(`${baseUrl}/rutas`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(validateFields.data),
+    });
+    const errorData = await response.json();
+    if (!response.ok) {
+      return {
+        success: false,
+        message: errorData.message || "Error en el servidor",
+        errors: {},
+      };
+    }
+
+    revalidatePath("/features/dashboard/parte-trabajo");
+
+    return { success: true, message: "Ruta creado con éxito", errors: {} };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Error en la base de datos";
+    return { success: false, message: errorMessage, errors: {} };
   }
 };

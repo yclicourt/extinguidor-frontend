@@ -1,28 +1,45 @@
-import { CalendarIcon } from "lucide-react";
+"use client";
+import { format } from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { es } from "date-fns/locale";
 
-interface PropsHeaderCalendar {
-  openModal: () => void;
-}
-const HeaderCalendar = ({ openModal }: PropsHeaderCalendar) => {
+const HeaderCalendar = () => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+
   return (
     <header className="flex justify-between items-center mb-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800">
-          Lunes, 2 de Febrero, 2026
-        </h1>
+      <div className="flex items-center gap-4">
+        <h2 className="text-2xl font-bold capitalize text-white">
+          {format(currentDate, "MMMM yyyy", { locale: es })}
+        </h2>
       </div>
-      <div className="flex gap-3">
+      <div className="flex gap-2 bg-slate-800 p-1 rounded-lg">
         <button
-          onClick={openModal}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium"
+          onClick={() =>
+            setCurrentDate(
+              new Date(currentDate.setMonth(currentDate.getMonth() - 1)),
+            )
+          }
+          className="p-2 hover:bg-slate-700 text-white rounded-md transition-colors"
         >
-          <CalendarIcon size={18} /> Crear Parte de Trabajo
+          <ChevronLeft size={20} />
         </button>
         <button
-          onClick={openModal}
-          className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium"
+          onClick={() => setCurrentDate(new Date())}
+          className="px-3 text-xs text-gray-400 hover:text-white uppercase font-bold"
         >
-          Subir Documentos/Fotos
+          Hoy
+        </button>
+        <button
+          onClick={() =>
+            setCurrentDate(
+              new Date(currentDate.setMonth(currentDate.getMonth() + 1)),
+            )
+          }
+          className="p-2 hover:bg-slate-700 text-white rounded-md transition-colors"
+        >
+          <ChevronRight size={20} />
         </button>
       </div>
     </header>

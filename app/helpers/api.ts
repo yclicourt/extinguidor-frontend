@@ -1,8 +1,8 @@
-interface Facture {
-  facture_parts: number;
-  facture_work_parts: number;
-  facture_amount: number;
-}
+import { Facture } from "./interfaces/facture.interface";
+import { ParteTrabajo } from "./interfaces/parte-trabajo.interface";
+import { Ruta } from "./interfaces/ruta.interface";
+import { User } from "./interfaces/user.interface";
+import { Vehicle } from "./interfaces/vehicle.interface";
 
 /**
  * All fetching data to Dashboard View
@@ -155,8 +155,10 @@ export const fetchUsers = async ({
   const searchTerm = params.query || "";
   try {
     const currentPage = params.page ? parseInt(params.page) : 1;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
     const fetchUser = await fetch(
-      `${process.env.BACKEND_URL}/users?query=${searchTerm}&page=${currentPage}&limit=${limit}`,
+      `${baseUrl}/users/pagination?query=${searchTerm}&page=${currentPage}&limit=${limit}`,
       {
         cache: "no-store",
       },
@@ -170,5 +172,111 @@ export const fetchUsers = async ({
   } catch (error) {
     console.log("error", error);
     throw new Error("Failed to fetching RouteGest data");
+  }
+};
+
+// En tu archivo de API (ej: lib/api.ts o services/calendar.service.ts)
+
+export interface CalendarDataResponse {
+  dataRoutes: Ruta[]; // Idealmente usa tus interfaces aquí
+  dataPartes: ParteTrabajo[];
+}
+
+export const fetchCalendarData = async (
+  month?: number,
+  year?: number,
+): Promise<CalendarDataResponse> => {
+  try {
+    const today = new Date();
+    const queryMonth = month || today.getMonth() + 1;
+    const queryYear = year || today.getFullYear();
+
+    // Importante: Si esta función se llama desde el cliente, necesitas NEXT_PUBLIC_
+    // Si se llama desde el servidor, BACKEND_URL está bien.
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+
+    const [routesRes, partsRes] = await Promise.all([
+      fetch(`${baseUrl}/rutas/byMonth?month=${queryMonth}&year=${queryYear}`, {
+        cache: "no-store",
+      }),
+      fetch(
+        `${baseUrl}/partes-trabajo/unassigned?month=${queryMonth}&year=${queryYear}`,
+        {
+          cache: "no-store",
+        },
+      ),
+    ]);
+
+    if (!routesRes.ok) {
+      const errorData = await routesRes.json();
+      console.error("Error en Rutas:", routesRes.status, errorData);
+      throw new Error(`Rutas falló con status ${routesRes.status}`);
+    }
+
+    if (!partsRes.ok) {
+      const errorData = await partsRes.json();
+      console.error("Error en Unassigned:", partsRes.status, errorData);
+      throw new Error(`Unassigned falló con status ${partsRes.status}`);
+    }
+
+    const partResult = await partsRes.json();
+    console.log("Data de partes: ", partResult);
+
+    return {
+      dataRoutes: await routesRes.json(),
+      dataPartes: partResult,
+    };
+  } catch (err) {
+    console.error("Error in fetchCalendarData:", err);
+    return { dataRoutes: [], dataPartes: [] };
+  }
+};
+
+interface IdsCollectionResponse {
+  dataVehicles: Vehicle[];
+  dataUsers: User[];
+  dataFactures: Facture[];
+}
+
+export const fetchIdsCollections = async (): Promise<IdsCollectionResponse> => {
+  try {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+
+    const [vehiclesRes, usersRes, facturesRes] = await Promise.all([
+      fetch(`${baseUrl}/vehicles`, { cache: "no-store" }),
+      fetch(`${baseUrl}/users`, { cache: "no-store" }),
+      fetch(`${baseUrl}/factures`, { cache: "no-store" }),
+    ]);
+
+    if (!vehiclesRes.ok) {
+      const errorData = await vehiclesRes.json();
+      console.error("Error en Vehiculos:", vehiclesRes.status, errorData);
+      throw new Error(`Vehiculo falló con status ${vehiclesRes.status}`);
+    }
+    if (!usersRes.ok) {
+      const errorData = await usersRes.json();
+      console.error("Error en Usuario:", usersRes.status, errorData);
+      throw new Error(`Usuario falló con status ${usersRes.status}`);
+    }
+    if (!facturesRes.ok) {
+      const errorData = await facturesRes.json();
+      console.error("Error en Factura:", facturesRes.status, errorData);
+      throw new Error(`Factura falló con status ${facturesRes.status}`);
+    }
+
+    const vehiclesData = await vehiclesRes.json();
+    const userData = await usersRes.json();
+    const facturesData = await facturesRes.json();
+
+    return {
+      dataVehicles: vehiclesData,
+      dataUsers: userData,
+      dataFactures: facturesData,
+    };
+  } catch (err) {
+    console.error("Error in fetchCalendarData:", err);
+    return { dataVehicles: [], dataUsers: [], dataFactures: [] };
   }
 };

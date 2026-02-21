@@ -1,8 +1,8 @@
 import { Mail, ShieldCheck } from "lucide-react";
 import { User } from "../../helpers/interfaces/user.interface";
-import UpdateUserWrapper from "./UpdateUserWrapper";
 import DeleteUser from "./DeleteUser";
 import UserAvatar from "./UserAvatar";
+import UpdateUserWrapper from "./UpdateUserWrapper";
 
 const UserTable = async ({ data }: { data: User[] }) => {
   const getAvatarUrl = (avatarPath: string | null) => {

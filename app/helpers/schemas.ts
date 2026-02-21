@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { Status } from "./enums/status.enum";
 import { Role } from "./enums/role.enum";
+import { EstadoParteTrabajo } from "./enums/part_work.enum";
+import { TipoTrabajo } from "./enums/type_work.enum";
+import { Categoria } from "./enums/category.enum";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB en bytes
 const ACCEPTED_FORMATS = ["image/webp", "image/jpeg", "image/png"];
@@ -16,6 +19,9 @@ const fileSchema = z
     "Solo se aceptan los formatos .webp, .jpg y .png",
   );
 
+/**
+ * Toda la data de UserSchema
+ */
 const UserFormSchema = z.object({
   id: z.coerce.number(),
   name: z
@@ -125,3 +131,115 @@ export const UpdateUserForm = UserFormSchema.partial({
   ),
 });
 export const DeleteUserFrom = UserFormSchema;
+
+/**
+ * Toda la data para ParteTrabajo Schema
+ *
+ */
+
+const ParteTrabajoSchema = z.object({
+  id: z.coerce.number(),
+  title: z
+    .string()
+    .min(2, "El titulo debe contener al menos 2 caracteres")
+    .max(50, "El titulo es demasiado largo")
+    .trim(),
+  description: z
+    .string()
+    .min(2, "La descripcion debe contener al menos 2 caracteres")
+    .max(100, "La descripcion es demasiado largo")
+    .trim(),
+  clientId: z.coerce.number(),
+  date: z.date(),
+  address: z
+    .string()
+    .min(2, "La descripcion debe contener al menos 2 caracteres")
+    .max(100, "La descripcion es demasiado largo")
+    .trim(),
+  state: z.enum(EstadoParteTrabajo, {
+    error: "Estado del parte de trabajo no válido",
+  }),
+  type_work: z.enum(TipoTrabajo, {
+    error: "Tipo de trabajo no válido",
+  }),
+  category: z.enum(Categoria, {
+    error: "Categoria no válida",
+  }),
+  docs: z
+    .string()
+    .min(2, "La descripcion debe contener al menos 2 caracteres")
+    .max(100, "La descripcion es demasiado largo")
+    .trim(),
+  image: z.preprocess((val) => {
+    // Si no hay archivo o el tamaño es 0, devolvemos undefined
+    if (val instanceof File && val.size === 0) return undefined;
+    return val;
+  }, fileSchema.optional()),
+  articuleId: z.coerce.number().optional(),
+  comment: z
+    .string()
+    .min(2, "La descripcion debe contener al menos 2 caracteres")
+    .max(100, "La descripcion es demasiado largo")
+    .trim(),
+  amount_facture_parte: z.coerce.number(),
+  factureId: z.coerce.number().optional(),
+  routeId: z.coerce.number().optional(),
+});
+
+export const UpdateParteTrabajoAssign = ParteTrabajoSchema.omit({
+  image: true,
+  factureId: true,
+  articuleId: true,
+}).extend({
+  image: z
+    .instanceof(File)
+    .optional()
+    .refine((file) => {
+      // Si no hay archivo o el tamaño es 0, es válido (porque es un update opcional)
+      if (!file || file.size === 0) return true;
+      // Si hay archivo, validamos el formato
+      return ACCEPTED_FORMATS.includes(file.type);
+    }, "Solo se aceptan los formatos .webp, .jpg y .png")
+    .refine((file) => {
+      if (!file || file.size === 0) return true;
+      return file.size <= MAX_FILE_SIZE;
+    }, "El archivo no puede pesar más de 5MB"),
+});
+
+const RutaSchema = z.object({
+  id: z.coerce.number(),
+  title: z
+    .string()
+    .min(2, "El titulo debe contener al menos 2 caracteres")
+    .max(100, "El titulo es demasiado largo")
+    .trim(),
+  in_charge: z
+    .string()
+    .min(2, "El encargado debe contener al menos 2 caracteres")
+    .max(50, "El encargado es demasiado largo")
+    .trim(),
+  userId: z.coerce.number(),
+  vehicleId: z.coerce.number(),
+  factureId: z.coerce.number(),
+  tools: z.preprocess(
+    (val) => {
+      // Si llega un string vacío o null, lo convertimos en array vacío para que no falle
+      if (!val || val === "") return [];
+      // Si por alguna razón llega un solo string (no array), lo envolvemos
+      return Array.isArray(val) ? val : [val];
+    },
+    z.array(z.string().min(2)).min(1, "Selecciona al menos una herramienta"),
+  ),
+  amount_facture_route: z.coerce.number(),
+  date: z.coerce.date(),
+  comments: z
+    .string()
+    .min(2, "Los comentarios deben contener al menos 2 caracteres")
+    .max(50, "Los comentarios son demasiado largo")
+    .trim(),
+  state: z.enum(EstadoParteTrabajo, {
+    error: "Estado del parte de trabajo no válido",
+  }),
+});
+
+export const CreateRouteForm = RutaSchema.omit({ id: true });

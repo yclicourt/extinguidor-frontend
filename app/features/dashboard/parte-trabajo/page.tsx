@@ -1,39 +1,22 @@
-import { Search, Calendar as FilterIcon } from "lucide-react";
+import CalendarWrapper from "@/app/components/calendar/CalendarWrapper";
 
-import Calendar from "@/app/components/calendar/Calendar";
-import RouteGest from "@/app/components/rutas/RouteGest";
-import ParteTrabajoWrapper from "@/app/components/parte-trabajo/ParteTrabajoWrapper";
-
-const ParteTrabajo = () => {
+interface Props {
+  children: React.ReactNode;
+}
+const ParteTrabajo = ({ children }: Props) => {
   return (
-    <div className="flex flex-col h-screen bg-gray-100 p-6">
+    <div className="flex flex-col h-screen p-6">
       {/* Header Superior */}
 
-      <ParteTrabajoWrapper>
-        <div className="flex gap-6 flex-1 overflow-hidden">
-          {/* Sección Izquierda */}
-          <div className="flex-3 bg-slate-200 rounded-xl shadow-sm border border-gray-200 flex flex-col">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-              <div className="relative w-64">
-                <Search
-                  className="absolute left-3 top-2.5 text-gray-400"
-                  size={16}
-                />
-                <input
-                  className="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg w-full text-sm outline-none"
-                  placeholder="Search"
-                />
-              </div>
-              <div className="flex items-center gap-2 text-sm text-slate-600">
-                <FilterIcon size={16} /> Filtros
-              </div>
-            </div>
-
-            <Calendar />
-          </div>
-          <RouteGest />
+      {/* <ParteTrabajoWrapper>
+      </ParteTrabajoWrapper> */}
+      <div className="flex gap-6 flex-1 overflow-hidden">
+        {/* Sección Izquierda */}
+        <div className="flex-3 rounded-xl shadow-sm flex flex-col">
+          {/* <Calendar /> */}
+          <CalendarWrapper>{children}</CalendarWrapper>
         </div>
-      </ParteTrabajoWrapper>
+      </div>
     </div>
   );
 };
