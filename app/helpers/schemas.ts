@@ -5,8 +5,14 @@ import { EstadoParteTrabajo } from "./enums/part_work.enum";
 import { TipoTrabajo } from "./enums/type_work.enum";
 import { Categoria } from "./enums/category.enum";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB en bytes
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 5MB en bytes
+const MAX_FILE__DOC_SIZE = 20 * 1024 * 1024; // 10 MB en bytes
 const ACCEPTED_FORMATS = ["image/webp", "image/jpeg", "image/png"];
+const ACCEPTED_FORMATS_DOCS = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordproccessingml.document",
+];
 
 const fileSchema = z
   .instanceof(File)
@@ -165,12 +171,13 @@ const ParteTrabajoSchema = z.object({
   category: z.enum(Categoria, {
     error: "Categoria no válida",
   }),
-  docs: z
-    .string()
-    .min(2, "La descripcion debe contener al menos 2 caracteres")
-    .max(100, "La descripcion es demasiado largo")
-    .trim(),
-  image: z.preprocess((val) => {
+  docs: z.preprocess((val) => {
+    // Si no hay archivo o el tamaño es 0, devolvemos undefined
+    if (val instanceof File && val.size === 0) return undefined;
+    return val;
+  }, fileSchema.optional()),
+
+  imageDoc: z.preprocess((val) => {
     // Si no hay archivo o el tamaño es 0, devolvemos undefined
     if (val instanceof File && val.size === 0) return undefined;
     return val;
@@ -186,12 +193,47 @@ const ParteTrabajoSchema = z.object({
   routeId: z.coerce.number().optional(),
 });
 
+export const CreateParteTrabajoForm = ParteTrabajoSchema.omit({
+  id: true,
+}).extend({
+  docs: z
+    .instanceof(File)
+    .optional()
+    .refine((file) => {
+      // Si no hay archivo o el tamaño es 0, es válido (porque es un update opcional)
+      if (!file || file.size === 0) return true;
+      // Si hay archivo, validamos el formato
+      const validTypes = ACCEPTED_FORMATS_DOCS.includes(file.type);
+      const validExtension = [".pdf", ".doc", ".docx"].some((ext) =>
+        file.name.toLowerCase().endsWith(ext),
+      );
+      return validTypes || validExtension;
+    }, "Solo se aceptan los formatos .doc, .pdf")
+    .refine((file) => {
+      if (!file || file.size === 0) return true;
+      return file.size <= MAX_FILE__DOC_SIZE;
+    }, "El archivo no puede pesar más de 5MB"),
+  imageDoc: z
+    .instanceof(File)
+    .optional()
+    .refine((file) => {
+      // Si no hay archivo o el tamaño es 0, es válido (porque es un update opcional)
+      if (!file || file.size === 0) return true;
+      // Si hay archivo, validamos el formato
+      return ACCEPTED_FORMATS.includes(file.type);
+    }, "Solo se aceptan los formatos .webp, .jpg y .png")
+    .refine((file) => {
+      if (!file || file.size === 0) return true;
+      return file.size <= MAX_FILE_SIZE;
+    }, "El archivo no puede pesar más de 5MB"),
+});
+
 export const UpdateParteTrabajoAssign = ParteTrabajoSchema.omit({
-  image: true,
+  imageDoc: true,
   factureId: true,
   articuleId: true,
 }).extend({
-  image: z
+  imageDoc: z
     .instanceof(File)
     .optional()
     .refine((file) => {

@@ -1,7 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { CreateRouteForm, CreateUserForm, UpdateUserForm } from "./schemas";
+import {
+  CreateParteTrabajoForm,
+  CreateRouteForm,
+  CreateUserForm,
+  UpdateUserForm,
+} from "./schemas";
 
 export type FormState = {
   errors?: Record<string, string[]>;
@@ -183,6 +188,84 @@ export const deleteUserForm = async (userId: number) => {
  * Actions para ParteTrabajo View
  */
 
+export const createParteTrabajoForm = async (
+  prevState: FormState,
+  formData: FormData,
+): Promise<FormState> => {
+  const imageFile = formData.get("image") as File;
+  const docsFile = formData.get("docs") as File;
+
+  const validateFields = CreateParteTrabajoForm.safeParse({
+    title: formData.get("title")?.toString(),
+    description: formData.get("description")?.toString(),
+    clientId: Number(formData.get("clientId")),
+    date: new Date(formData.get("date")?.toString() || ""),
+    address: formData.get("address")?.toString(),
+    state: formData.get("state")?.toString(),
+    type_work: formData.get("type_work")?.toString(),
+    category: formData.get("category")?.toString(),
+    docs: docsFile,
+    imageDoc: imageFile,
+    articuleId: Number(formData.get("articuleId")),
+    comment: formData.get("comment")?.toString(),
+    amount_facture_parte: Number(formData.get("amount_facture_parte")),
+    factureId: Number(formData.get("factureId")),
+    routeId: Number(formData.get("routeId")),
+  });
+
+  if (!validateFields.success) {
+    return {
+      errors: validateFields.error.flatten().fieldErrors,
+      message: "No se encuentran los campos, Fallo al crear el usuario",
+    };
+  }
+
+  const data = validateFields.data;
+  const dataToSend = new FormData();
+
+  Object.keys(data).forEach((key) => {
+    const value = data[key as keyof typeof data];
+
+    if (value instanceof Date) {
+      dataToSend.append(key, value.toISOString());
+    } else if (value instanceof File) {
+      dataToSend.append(key, value);
+    } else if (value !== undefined && value !== null) {
+      dataToSend.append(key, String(value));
+    }
+  });
+
+  try {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+
+    const response = await fetch(`${baseUrl}/partes-trabajo`, {
+      method: "POST",
+      body: dataToSend,
+    });
+    const errorData = await response.json();
+    console.log("Error del backend: >>", errorData);
+    if (!response.ok) {
+      return {
+        success: false,
+        message: errorData.message || "Error en el servidor",
+        errors: {},
+      };
+    }
+    revalidatePath("/features/dashboard/parte-trabajo");
+
+    return {
+      success: true,
+      message: "Parte de Trabajo creado con éxito",
+      errors: {},
+    };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Error en la base de datos";
+    return { success: false, message: errorMessage, errors: {} };
+  }
+};
+
 export const editParteTrabajoAssignToRoute = async (
   parteId: number,
   routeId: number,
@@ -196,9 +279,9 @@ export const editParteTrabajoAssignToRoute = async (
           "Content-Type": "application/json",
           // Aquí puedes añadir tokens de sesión si tu backend lo requiere
         },
+        cache: "no-store",
       },
     );
-
     if (!response.ok) {
       return { success: false, error: "Error en el servidor backend" };
     }
@@ -242,7 +325,7 @@ export const createRouteForm = async (
   if (!validateFields.success) {
     return {
       errors: validateFields.error.flatten().fieldErrors,
-      message: "No se encuentran los campos, Fallo al crear el usuario",
+      message: "No se encuentran los campos, Fallo al crear la ruta",
     };
   }
 
@@ -268,7 +351,7 @@ export const createRouteForm = async (
 
     revalidatePath("/features/dashboard/parte-trabajo");
 
-    return { success: true, message: "Ruta creado con éxito", errors: {} };
+    return { success: true, message: "Ruta creada con éxito", errors: {} };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Error en la base de datos";

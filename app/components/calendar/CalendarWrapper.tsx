@@ -16,6 +16,7 @@ import { ParteTrabajo } from "@/app/helpers/interfaces/parte-trabajo.interface";
 import { editParteTrabajoAssignToRoute } from "@/app/helpers/actions";
 import HeaderCalendar from "./HeaderCalendar";
 import RouteWrapper from "../rutas/RouteWrapper";
+import ParteTrabajoWrapper from "../parte-trabajo/ParteTrabajoWrapper";
 
 interface Props {
   children: React.ReactNode;
@@ -40,8 +41,6 @@ const CalendarView = ({ children }: Props) => {
 
       // Llamamos a tu helper de API
       const { dataRoutes, dataPartes } = await fetchCalendarData(month, year);
-
-      console.log("Datos recibidos de la API:", dataPartes);
 
       // Guardamos en los estados para que useMemo pueda filtrar
       setRoutes(dataRoutes);
@@ -70,14 +69,27 @@ const CalendarView = ({ children }: Props) => {
     try {
       const result = await editParteTrabajoAssignToRoute(parteId, routeId);
       if (result.success) {
-        toast.success("Parte asignado correctamente", { id: toastId });
-
-        // 3. Refrescar los datos locales
-        // Si usas el useEffect que carga datos por mes, simplemente vuelve a disparar esa carga
-        // o filtra el estado localmente:
+        const partAssign = unassignedParts.find((p) => p.id === parteId);
         setUnassignedParts((prev) =>
           prev.filter((p: ParteTrabajo) => p.id !== parteId),
         );
+
+        setRoutes((prevRoutes) =>
+          prevRoutes.map((route) => {
+            if (route.id === routeId) {
+              return {
+                ...route,
+                parts: partAssign
+                  ? ([...(route.parts || []), partAssign].filter(
+                      Boolean,
+                    ) as ParteTrabajo[])
+                  : route.parts || [],
+              };
+            }
+            return route;
+          }),
+        );
+        toast.success("Parte asignado correctamente", { id: toastId });
 
         // Refrescamos los datos del servidor para que las rutas
         // muestren el nuevo conteo de partes o detalles actualizados
@@ -148,9 +160,9 @@ const CalendarView = ({ children }: Props) => {
                         </span>
 
                         {/* BADGE DE PARTES ASIGNADOS */}
-                        {r.partes && r.partes.length > 0 && (
+                        {r.parts && r.parts.length > 0 && (
                           <span className="ml-1 bg-blue-500 text-white text-[8px] px-1 rounded-full font-bold min-w-3 text-center">
-                            {r.partes.length}
+                            {r.parts.length}
                           </span>
                         )}
                       </div>
@@ -167,9 +179,13 @@ const CalendarView = ({ children }: Props) => {
           })}
         </div>
 
-        <RouteWrapper selectedDay={selectedDay} onRouteCreated={loadData}>
-          {children}
-        </RouteWrapper>
+        <div className="flex flex-row gap-2">
+          <RouteWrapper selectedDay={selectedDay} onRouteCreated={loadData}>
+            {children}
+          </RouteWrapper>
+
+          <ParteTrabajoWrapper>{children}</ParteTrabajoWrapper>
+        </div>
       </div>
 
       {/* SECCIÓN DERECHA: PANEL DE DETALLES */}
@@ -202,7 +218,7 @@ const CalendarView = ({ children }: Props) => {
                       {route.title}
                     </p>
                     <span className="text-[10px] bg-slate-700 text-gray-300 px-2 py-0.5 mr-2 rounded-md">
-                      {route.partes?.length || 0} partes
+                      {route.parts?.length || 0} partes
                     </span>
 
                     {activeRouteId === route.id && (

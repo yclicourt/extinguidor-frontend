@@ -150,7 +150,7 @@ const CreateRouteFormModal = ({
 
         {/* Formulario - Con Scroll */}
         <form
-          id="create-user-form"
+          id="create-route-form"
           action={formAction}
           className="flex-1 overflow-y-auto p-6 custom-scrollbar"
         >
@@ -344,7 +344,7 @@ const CreateRouteFormModal = ({
           </button>
           <button
             type="submit"
-            form="create-user-form"
+            form="create-route-form"
             disabled={isPending}
             onClick={() => {
               // Solo disparamos el loading si el formulario es válido visualmente

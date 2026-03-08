@@ -16,6 +16,7 @@ export interface ParteTrabajo {
   state: EstadoParteTrabajo;
   type_work: TipoTrabajo;
   category: Categoria;
+  imageDoc?: string;
   docs?: string;
   articuleId: number;
   comment?: string;

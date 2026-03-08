@@ -15,5 +15,5 @@ export interface Ruta {
   comments?: string;
   status: EstadoParteTrabajo;
   amount_facture_route: number;
-  partes?: ParteTrabajo[];
+  parts?: ParteTrabajo[];
 }

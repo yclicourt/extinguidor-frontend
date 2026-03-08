@@ -1,3 +1,5 @@
+import { Articule } from "./interfaces/articule.interface";
+import { Client } from "./interfaces/client.inteface";
 import { Facture } from "./interfaces/facture.interface";
 import { ParteTrabajo } from "./interfaces/parte-trabajo.interface";
 import { Ruta } from "./interfaces/ruta.interface";
@@ -221,7 +223,6 @@ export const fetchCalendarData = async (
     }
 
     const partResult = await partsRes.json();
-    console.log("Data de partes: ", partResult);
 
     return {
       dataRoutes: await routesRes.json(),
@@ -280,3 +281,66 @@ export const fetchIdsCollections = async (): Promise<IdsCollectionResponse> => {
     return { dataVehicles: [], dataUsers: [], dataFactures: [] };
   }
 };
+
+interface IdsCollectionParteTrabajoResponse {
+  dataArticules: Articule[];
+  dataClients: Client[];
+  dataFactures: Facture[];
+  dataRutas: Ruta[];
+}
+
+export const fetchIdsCollectionsParteTrabajo =
+  async (): Promise<IdsCollectionParteTrabajoResponse> => {
+    try {
+      const baseUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+
+      const [articlesRes, clientsRes, facturesRes, rutasRes] =
+        await Promise.all([
+          fetch(`${baseUrl}/articules`, { cache: "no-store" }),
+          fetch(`${baseUrl}/clients`, { cache: "no-store" }),
+          fetch(`${baseUrl}/factures`, { cache: "no-store" }),
+          fetch(`${baseUrl}/rutas`, { cache: "no-store" }),
+        ]);
+
+      if (!articlesRes.ok) {
+        const errorData = await articlesRes.json();
+        console.error("Error en Articulos:", articlesRes.status, errorData);
+        throw new Error(`Articulo falló con status ${articlesRes.status}`);
+      }
+      if (!clientsRes.ok) {
+        const errorData = await clientsRes.json();
+        console.error("Error en Cliente:", clientsRes.status, errorData);
+        throw new Error(`Cliente falló con status ${clientsRes.status}`);
+      }
+      if (!facturesRes.ok) {
+        const errorData = await facturesRes.json();
+        console.error("Error en Factura:", facturesRes.status, errorData);
+        throw new Error(`Factura falló con status ${facturesRes.status}`);
+      }
+      if (!rutasRes.ok) {
+        const errorData = await rutasRes.json();
+        console.error("Error en Ruta:", rutasRes.status, errorData);
+        throw new Error(`Ruta falló con status ${rutasRes.status}`);
+      }
+
+      const articlesData = await articlesRes.json();
+      const clientsData = await clientsRes.json();
+      const facturesData = await facturesRes.json();
+      const rutasData = await rutasRes.json();
+      return {
+        dataArticules: articlesData,
+        dataClients: clientsData,
+        dataFactures: facturesData,
+        dataRutas: rutasData,
+      };
+    } catch (err) {
+      console.error("Error in fetchCalendarData:", err);
+      return {
+        dataArticules: [],
+        dataClients: [],
+        dataFactures: [],
+        dataRutas: [],
+      };
+    }
+  };
