@@ -121,20 +121,27 @@ export const fetchTablePartsWorks = async ({
 
 export const fetchRoutesGest = async ({
   limit = 5,
-}: { limit?: number } = {}) => {
+  cursor,
+}: { limit?: number; cursor?: string } = {}) => {
   try {
-    const fetchRoutes = await fetch(
-      `${process.env.BACKEND_URL}/rutas?limit=${limit}`,
-      {
-        cache: "no-store",
-      },
-    );
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+    const url = new URL(`${baseUrl}/rutas`);
+    url.searchParams.append("limit", limit.toString());
+    if (cursor) url.searchParams.append("cursor", cursor.toString());
+
+    console.log("La URL confromada: ", url);
+    const fetchRoutes = await fetch(url.toString(), {
+      cache: "no-store",
+    });
+
+    if (!fetchRoutes.ok) throw new Error(" Failed t fetching Route data");
 
     const resultFetchRoutes = await fetchRoutes.json();
 
     return {
-      data: resultFetchRoutes,
-      params: { limit },
+      data: resultFetchRoutes.data,
+      nextCursor: resultFetchRoutes.nextCursor,
     };
   } catch (error) {
     console.log("error", error);

@@ -1,4 +1,4 @@
-import { EstadoParteTrabajo } from "../enums/part_work.enum";
+import { RutaState } from "../enums/ruta.enum";
 import { ParteTrabajo } from "./parte-trabajo.interface";
 
 export interface Ruta {
@@ -13,7 +13,7 @@ export interface Ruta {
   tools: string[];
   date: Date;
   comments?: string;
-  status: EstadoParteTrabajo;
+  state: RutaState;
   amount_facture_route: number;
   parts?: ParteTrabajo[];
 }
