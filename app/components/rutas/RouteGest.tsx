@@ -40,14 +40,14 @@ async function RouteGest() {
               </div>
               <div
                 className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                  ruta.status === "FINALIZADO"
+                  ruta.state === "FINALIZADO"
                     ? "border-green-500"
-                    : ruta.status === "PENDIENTE"
+                    : ruta.state === "PENDIENTE"
                       ? "border-orange-400"
                       : "border-gray-300"
                 }`}
               >
-                {ruta.status === "FINALIZADO" && (
+                {ruta.state === "FINALIZADO" && (
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
                 )}
               </div>

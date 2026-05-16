@@ -72,7 +72,7 @@ const CreateWorkOrderModal = ({ isOpen, onClose }: Props) => {
         setArticules(dataArticules);
         setClients(dataClients);
         setFactures(dataFactures);
-        setRutas(dataRutas);
+        setRutas(dataRutas?.data);
       }
     };
     loadDataIds();
@@ -191,7 +191,7 @@ const CreateWorkOrderModal = ({ isOpen, onClose }: Props) => {
                 {...register("clientId")}
                 className={inputStyles(errors.clientId)}
               >
-                <option value="">Seleccione una factura...</option>
+                <option value="">Seleccione un cliente...</option>
                 {clients.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -272,7 +272,7 @@ const CreateWorkOrderModal = ({ isOpen, onClose }: Props) => {
                 {...register("articuleId")}
                 className={inputStyles(errors.articuleId)}
               >
-                <option value="">Seleccione una factura...</option>
+                <option value="">Seleccione un articulo...</option>
                 {articules.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.title}
@@ -286,7 +286,7 @@ const CreateWorkOrderModal = ({ isOpen, onClose }: Props) => {
                 {...register("routeId")}
                 className={inputStyles(errors.routeId)}
               >
-                <option value="">Seleccione una factura...</option>
+                <option value="">Seleccione una ruta...</option>
                 {rutas.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.title}

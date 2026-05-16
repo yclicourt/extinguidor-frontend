@@ -146,7 +146,6 @@ export const editUserForm = async (
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.log("Error de backend", errorData);
       return {
         success: false,
         message: errorData.message || "Error en el servidor",
@@ -170,7 +169,6 @@ export const deleteUserForm = async (userId: number) => {
     });
     if (!response.ok) {
       const errorData = await response.json();
-      console.log("Error del backend:", errorData);
       return {
         success: false,
         message: errorData.message || "Error en el servidor",
@@ -192,7 +190,7 @@ export const createParteTrabajoForm = async (
   prevState: FormState,
   formData: FormData,
 ): Promise<FormState> => {
-  const imageFile = formData.get("image") as File;
+  const imageFile = formData.get("imageDoc") as File;
   const docsFile = formData.get("docs") as File;
 
   const validateFields = CreateParteTrabajoForm.safeParse({
@@ -216,7 +214,7 @@ export const createParteTrabajoForm = async (
   if (!validateFields.success) {
     return {
       errors: validateFields.error.flatten().fieldErrors,
-      message: "No se encuentran los campos, Fallo al crear el usuario",
+      message: "No se encuentran los campos, Fallo al crear el parte de trabajo",
     };
   }
 
@@ -244,7 +242,6 @@ export const createParteTrabajoForm = async (
       body: dataToSend,
     });
     const errorData = await response.json();
-    console.log("Error del backend: >>", errorData);
     if (!response.ok) {
       return {
         success: false,

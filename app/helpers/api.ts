@@ -130,7 +130,6 @@ export const fetchRoutesGest = async ({
     url.searchParams.append("limit", limit.toString());
     if (cursor) url.searchParams.append("cursor", cursor.toString());
 
-    console.log("La URL confromada: ", url);
     const fetchRoutes = await fetch(url.toString(), {
       cache: "no-store",
     });
@@ -184,10 +183,12 @@ export const fetchUsers = async ({
   }
 };
 
-// En tu archivo de API (ej: lib/api.ts o services/calendar.service.ts)
+/**
+ * Function to fetching Calendar Data
+ */
 
 export interface CalendarDataResponse {
-  dataRoutes: Ruta[]; // Idealmente usa tus interfaces aquí
+  dataRoutes: Ruta[];
   dataPartes: ParteTrabajo[];
 }
 
@@ -241,6 +242,9 @@ export const fetchCalendarData = async (
   }
 };
 
+/**
+ * Function to collect all ids to create routes
+ */
 interface IdsCollectionResponse {
   dataVehicles: Vehicle[];
   dataUsers: User[];
@@ -289,11 +293,19 @@ export const fetchIdsCollections = async (): Promise<IdsCollectionResponse> => {
   }
 };
 
+/**
+ * Function to collect all ids to create work parts
+ */
+interface PagedResponse<Ruta> {
+  data: Ruta[];
+  nextCursor: number | null;
+}
+
 interface IdsCollectionParteTrabajoResponse {
   dataArticules: Articule[];
   dataClients: Client[];
   dataFactures: Facture[];
-  dataRutas: Ruta[];
+  dataRutas: PagedResponse<Ruta>;
 }
 
 export const fetchIdsCollectionsParteTrabajo =
@@ -347,7 +359,27 @@ export const fetchIdsCollectionsParteTrabajo =
         dataArticules: [],
         dataClients: [],
         dataFactures: [],
-        dataRutas: [],
+        dataRutas: {
+          data: [],
+          nextCursor: null,
+        },
       };
     }
   };
+
+/**
+ * All fetching work parts
+ */
+
+export const fetchAllWorkParts = async () => {
+  try {
+    const fetchWorkParts = await fetch(
+      `${process.env.BACKEND_URL}/partes-trabajo`,
+    );
+    const resultWorkParts = await fetchWorkParts.json();
+    return resultWorkParts;
+  } catch (error) {
+    console.error ("error: ",error)
+    throw new Error("Failed to fetch fetchWorkParts data");
+  }
+};

@@ -23,4 +23,6 @@ export interface ParteTrabajo {
   factureId: number;
   routeId: number;
   amount_facture_parte: number;
+  latCor: number
+  longCor: number
 }

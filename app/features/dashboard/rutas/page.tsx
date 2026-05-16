@@ -1,8 +1,13 @@
 import { MapPin, Camera, ChevronLeft, Settings } from "lucide-react";
 import { bebas } from "@/app/ui/font";
 import RouteMap from "@/app/components/rutas/RouteMap";
+import { fetchAllWorkParts } from "@/app/helpers/api";
+import RouteMapVisualizerWrapper from "@/app/components/rutas/RouteMapVisualizerWrapper";
 
-const Rutas = async () => {
+const Rutas = async () => { 
+
+  const dataParts = await fetchAllWorkParts()
+
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-slate-50">
       {/* PANEL IZQUIERDO: Formulario y Listado (Desktop) / Vista Principal (Mobile) */}
@@ -20,9 +25,10 @@ const Rutas = async () => {
       </section>
 
       {/* PANEL CENTRAL: Mapa (Oculto en mobile si se desea o integrado) */}
-      <section className="hidden lg:flex flex-1 bg-slate-200 relative items-center justify-center">
-        <div className="absolute inset-0 bg-[url('https://camo.githubusercontent.com/8309d435091a92e1bba80a9117f353a8126b91c78edc60773d2a0ed40523db42/68747470733a2f2f692e737461636b2e696d6775722e636f6d2f6f725a444a2e706e67')] bg-cover opacity-50">
-          {/* Aquí iría el componente de Google Maps o Leaflet */}
+      <section className="hidden lg:flex flex-1 bg-slate-100 relative items-center justify-center h-full">
+        <div className="absolute inset-0 w-full h-full z-10">
+          {/* AQUÍ INYECTAMOS TU MAPA REAL DE LEAFLET */}
+          <RouteMapVisualizerWrapper partes={dataParts}/>
         </div>
       </section>
 
